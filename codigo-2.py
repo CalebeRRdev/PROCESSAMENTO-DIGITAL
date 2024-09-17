@@ -21,7 +21,16 @@ contornos = measure.find_contours(matriz_imagem, 0.8)
 desenhar = ImageDraw.Draw(imagem_mama)
 for contorno in contornos:
     for i in range(len(contorno) - 1):
-        desenhar.line((contorno[i][1], contorno[i][0], contorno[i+1][1], contorno[i+1][0]), fill='red', width=2)
+        desenhar.line(
+            (
+                contorno[i][1],
+                contorno[i][0],
+                contorno[i + 1][1],
+                contorno[i + 1][0],
+            ),
+            fill='red',
+            width=2,
+        )
 
 # Realçando o contraste da imagem
 realcar = ImageEnhance.Contrast(imagem_mama)
@@ -35,4 +44,3 @@ plt.imshow(imagem_realcada, cmap='gray')
 plt.title('Imagem com Contornos e Contraste Aumentado')
 plt.axis('off')
 plt.show()
-
