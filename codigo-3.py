@@ -11,7 +11,9 @@ numero_pixels_branco = np.sum(imagem_cv2 == 255)
 numero_pixels_preto = np.sum(imagem_cv2 == 0)
 
 # Calculando o percentual de pixels brancos
-percentual_pixels_brancos = numero_pixels_branco / (numero_pixels_branco + numero_pixels_preto) * 100
+percentual_pixels_brancos = (
+    numero_pixels_branco / (numero_pixels_branco + numero_pixels_preto) * 100
+)
 
 # Inferindo a presença de câncer com base no percentual de pixels brancos
 if percentual_pixels_brancos >= 30:
@@ -20,5 +22,3 @@ else:
     print('Imagem sem câncer')
 
 print(f'Percentual de pixels brancos: {percentual_pixels_brancos:.2f}%')
-
-
