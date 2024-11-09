@@ -1,4 +1,11 @@
-# Instalando pacotes necessários
+# Importar o módulo de upload de arquivos
+from google.colab import files
+
+# Fazer upload da imagem para o Colab
+uploaded = files.upload()
+
+# Instalar pacotes necessários (se ainda não estiverem instalados)
+
 !pip install cryptography pillow
 
 from cryptography.hazmat.primitives import serialization, hashes
@@ -31,7 +38,7 @@ def embed_text_in_image(image_path, output_image_path, text):
 
     result_image = Image.fromarray(data)
     result_image.save(output_image_path)
-    print("Texto embutido na imagem com sucesso!")
+    print("\n\tTexto embutido na imagem com sucesso!")
 
 # Função para recuperar texto de uma imagem (Steganography)
 def extract_text_from_image(image_path):
@@ -49,7 +56,10 @@ def extract_text_from_image(image_path):
     end_marker = text.find('\xFF\xFE')
     if end_marker != -1:
         text = text[:end_marker]
-    print("Texto recuperado da imagem:")
+    else:
+        text = text.split("\x00", 1)[0]  # Parar na primeira ocorrência de \x00 como uma alternativa
+
+    print("\n\tTexto recuperado da imagem:")
     print(text)
 
 # Função para gerar hash de uma imagem
@@ -57,7 +67,7 @@ def generate_hash(image_path):
     with open(image_path, "rb") as f:
         bytes = f.read()
         hash = hashlib.sha256(bytes).hexdigest()
-    print(f"Hash da imagem ({image_path}): {hash}")
+    print(f"\n\tHash da imagem ({image_path}): {hash}")
 
 # Função para encriptar mensagem
 def encrypt_message(public_key, message):
@@ -69,11 +79,15 @@ def encrypt_message(public_key, message):
             label=None
         )
     )
-    print("Mensagem encriptada com sucesso!")
-    return encrypted
+    print("\n\tMensagem encriptada com sucesso!")
+    # Retornar a mensagem encriptada em formato hexadecimal para facilitar a visualização
+    encrypted_hex = encrypted.hex()
+    print("\n\tMensagem encriptada (em hexadecimal):", encrypted_hex)
+    return encrypted_hex
 
 # Função para decriptar mensagem
-def decrypt_message(private_key, encrypted_message):
+def decrypt_message(private_key, encrypted_message_hex):
+    encrypted_message = bytes.fromhex(encrypted_message_hex)
     decrypted = private_key.decrypt(
         encrypted_message,
         padding.OAEP(
@@ -82,7 +96,7 @@ def decrypt_message(private_key, encrypted_message):
             label=None
         )
     )
-    print("Mensagem decriptada com sucesso!")
+    print("\n\tMensagem decriptada com sucesso!")
     return decrypted.decode()
 
 # Gerar chave pública e privada
@@ -94,45 +108,45 @@ public_key = private_key.public_key()
 
 # Loop do menu de opções
 while True:
-    print("\nMenu de opções:")
-    print("(1) Embutir texto em uma imagem (Steganography)")
-    print("(2) Recuperar texto de uma imagem (Steganography)")
-    print("(3) Gerar hash de imagens")
-    print("(4) Encriptar mensagem")
-    print("(5) Decriptar mensagem")
-    print("(S ou s) Sair")
+    print("\n\tMenu de opções:")
+    print("\n\n\t(1) Embutir texto em uma imagem (Steganography)")
+    print("\n\t(2) Recuperar texto de uma imagem (Steganography)")
+    print("\n\t(3) Gerar hash de imagens")
+    print("\n\t(4) Encriptar mensagem")
+    print("\n\t(5) Decriptar mensagem")
+    print("\n\t(S ou s) Sair")
 
-    option = input("Escolha uma opção: ").strip()
+    option = input("\n\tEscolha uma opção: ").strip()
 
     if option == '1':
-        image_path = input("Digite o caminho da imagem original: ")
-        output_image_path = input("Digite o caminho para salvar a imagem alterada: ")
-        text = input("Digite o texto a ser embutido: ")
+        image_path = input("\n\tDigite o caminho da imagem original: ").strip()
+        output_image_path = input("\n\tDigite o caminho para salvar a imagem alterada: ").strip()
+        text = input("\n\tDigite o texto a ser embutido: ")
         embed_text_in_image(image_path, output_image_path, text)
 
     elif option == '2':
-        image_path = input("Digite o caminho da imagem alterada: ")
+        image_path = input("\n\tDigite o caminho da imagem alterada: ").strip()
         extract_text_from_image(image_path)
 
     elif option == '3':
-        image_path_original = input("Digite o caminho da imagem original: ")
-        image_path_altered = input("Digite o caminho da imagem alterada: ")
+        image_path_original = input("\n\tDigite o caminho da imagem original: ").strip()
+        image_path_altered = input("\n\tDigite o caminho da imagem alterada: ").strip()
         generate_hash(image_path_original)
         generate_hash(image_path_altered)
 
     elif option == '4':
-        message = input("Digite a mensagem a ser encriptada: ")
-        encrypted_message = encrypt_message(public_key, message)
-        print("Mensagem encriptada:", encrypted_message)
+        message = input("\n\tDigite a mensagem a ser encriptada: ")
+        encrypted_message_hex = encrypt_message(public_key, message)
+        print("\n\tMensagem encriptada (em hexadecimal):", encrypted_message_hex)
 
     elif option == '5':
-        encrypted_message = bytes.fromhex(input("Digite a mensagem encriptada em hexadecimal: "))
-        decrypted_message = decrypt_message(private_key, encrypted_message)
-        print("Mensagem decriptada:", decrypted_message)
+        encrypted_message_hex = input("\n\tDigite a mensagem encriptada em hexadecimal: ")
+        decrypted_message = decrypt_message(private_key, encrypted_message_hex)
+        print("\n\tMensagem decriptada:", decrypted_message)
 
     elif option.lower() == 's':
-        print("Encerrando a aplicação. Até mais!")
+        print("\n\tEncerrando a aplicação. Até mais!")
         break
 
     else:
-        print("Opção inválida. Tente novamente.")
+        print("\n\tOpção inválida. Tente novamente.")
